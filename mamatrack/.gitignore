@@ -1,0 +1,21 @@
+# Runtime database and backups
+/data/*.sqlite
+/data/*.sqlite-*
+/data/backups/
+/data/last_check.txt
+
+# Local secrets
+.env
+.env.*
+!.env.example
+
+# PHP dependencies
+/vendor/
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log

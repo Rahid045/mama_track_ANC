@@ -1,0 +1,5 @@
+# Apache hardening (ignored by PHP's built-in server)
+Options -Indexes
+<FilesMatch "\.(sqlite|sqlite-wal|sqlite-shm|txt|md)$">
+  Require all denied
+</FilesMatch>
