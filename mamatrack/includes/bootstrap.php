@@ -8,13 +8,39 @@ function cfg(string $key, $default = null) {
     return $CONFIG[$key] ?? $default;
 }
 
+require __DIR__ . '/db.php';
+
+/** Persist Vercel sessions in PostgreSQL so they survive instance replacement. */
+final class DatabaseSessionHandler implements SessionHandlerInterface {
+    public function open(string $path, string $name): bool { return true; }
+    public function close(): bool { return true; }
+    public function read(string $id): string {
+        $s = db()->prepare('SELECT data FROM sessions WHERE id=?');
+        $s->execute([$id]);
+        return (string)($s->fetchColumn() ?: '');
+    }
+    public function write(string $id, string $data): bool {
+        $s = db()->prepare('INSERT INTO sessions(id,data,updated_at) VALUES(?,?,?) ON CONFLICT (id) DO UPDATE SET data=EXCLUDED.data, updated_at=EXCLUDED.updated_at');
+        return $s->execute([$id, $data, date('Y-m-d H:i:s')]);
+    }
+    public function destroy(string $id): bool {
+        return db()->prepare('DELETE FROM sessions WHERE id=?')->execute([$id]);
+    }
+    public function gc(int $max_lifetime): int|false {
+        $s = db()->prepare("DELETE FROM sessions WHERE updated_at < ?");
+        $s->execute([date('Y-m-d H:i:s', time() - $max_lifetime)]);
+        return $s->rowCount();
+    }
+}
+
 if (session_status() === PHP_SESSION_NONE && PHP_SAPI !== 'cli') {
+    if (cfg('database_url')) session_set_save_handler(new DatabaseSessionHandler(), true);
     session_name('mamatrack');
-    session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax', 'secure' => !empty($_SERVER['HTTPS'])]);
+    $isHttps = !empty($_SERVER['HTTPS']) || ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
+    session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax', 'secure' => $isHttps]);
     session_start();
 }
 
-require __DIR__ . '/db.php';
 require __DIR__ . '/risk.php';
 require __DIR__ . '/notify.php';
 require __DIR__ . '/layout.php';
@@ -99,6 +125,8 @@ function get_patient(int $id): ?array {
 }
 /** Run the missed-appointment check at most once every 5 minutes, triggered by normal page use. */
 function maybe_run_checks(): void {
+    // Vercel invokes cron/run.php on a schedule; its filesystem is not shared.
+    if (getenv('VERCEL')) return;
     $f = dirname(cfg('db_path')) . '/last_check.txt';
     if (file_exists($f) && time() - filemtime($f) < 300) return;
     @touch($f);

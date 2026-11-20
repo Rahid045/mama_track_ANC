@@ -17,6 +17,17 @@ Open http://localhost:8000
 First login: `admin@mamatrack.local` / `Admin@123` (you must change it immediately).
 Demo staff (after seed): `sarah@mamatrack.local`, `peter@mamatrack.local` (doctors), `grace@mamatrack.local` (nurse) — password `Demo@1234`.
 
+## Deploy on Vercel
+
+This repository includes a `Dockerfile` and `Caddyfile` for Vercel's Container runtime. SQLite is retained for local XAMPP use only: Vercel instances have non-durable local storage, so production requires hosted PostgreSQL.
+
+1. Create a PostgreSQL database (the Vercel Marketplace Postgres integration is suitable) and copy its connection URL.
+2. Import the repository into Vercel. Set the project framework to **Container** if it is not detected automatically.
+3. In **Settings → Environment Variables**, add `DATABASE_URL`, `BASE_URL` (your production URL), and a long random `CRON_SECRET`; use `.env.example` as the template. Do not commit these values.
+4. Deploy. The first request creates the tables and the initial administrator. Change the initial administrator password immediately.
+
+`vercel.json` runs the protected missed-appointment/reminder task hourly in production. The task validates Vercel's `CRON_SECRET` bearer token. Backups must be managed through the hosted PostgreSQL provider; downloading a local SQLite backup is intentionally disabled in production.
+
 ## How it maps to the proposal
 | Objective | Where |
 |---|---|

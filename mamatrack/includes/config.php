@@ -4,6 +4,9 @@ return [
     'app_name'    => 'MamaTrack ANC',
     'timezone'    => 'Africa/Kampala',
     'db_path'     => __DIR__ . '/../data/mamatrack.sqlite',
+    // Set DATABASE_URL on Vercel to a hosted PostgreSQL connection string.
+    // When it is unset, the application keeps using local SQLite for XAMPP.
+    'database_url' => getenv('DATABASE_URL') ?: '',
     'backup_dir'  => __DIR__ . '/../data/backups',
     'grace_days'  => 0,          // an appointment becomes "missed" when appt_date < today - grace_days
     'session_minutes' => 30,     // auto sign-out after inactivity

@@ -49,6 +49,7 @@ function notify_person(?int $apptId, string $who, ?string $phone, ?string $email
 }
 
 function base_url(): string {
+    if ($env = getenv('BASE_URL')) return rtrim($env, '/');
     $b = cfg('base_url');
     if ($b) return rtrim($b, '/');
     $scheme = !empty($_SERVER['HTTPS']) ? 'https' : 'http';
