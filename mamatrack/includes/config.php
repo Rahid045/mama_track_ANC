@@ -1,12 +1,19 @@
 <?php
 // MamaTrack ANC — configuration. Edit values here (no code changes needed elsewhere).
-return [
+$config = [
     'app_name'    => 'MamaTrack ANC',
     'timezone'    => 'Africa/Kampala',
     'db_path'     => __DIR__ . '/../data/mamatrack.sqlite',
-    // Set DATABASE_URL on Vercel to a hosted PostgreSQL connection string.
-    // When it is unset, the application keeps using local SQLite for XAMPP.
-    'database_url' => getenv('DATABASE_URL') ?: '',
+    // InfinityFree uses MySQL. Put the actual credentials in config.local.php
+    // (created from config.local.php.example), never in this tracked file.
+    'database' => [
+        'driver' => 'sqlite', // sqlite for XAMPP, mysql for InfinityFree
+        'host' => '',
+        'port' => 3306,
+        'name' => '',
+        'user' => '',
+        'password' => '',
+    ],
     'backup_dir'  => __DIR__ . '/../data/backups',
     'grace_days'  => 0,          // an appointment becomes "missed" when appt_date < today - grace_days
     'session_minutes' => 30,     // auto sign-out after inactivity
@@ -21,3 +28,11 @@ return [
         'at_sender'    => '',          // optional approved sender ID
     ],
 ];
+
+$local = __DIR__ . '/config.local.php';
+if (is_file($local)) {
+    $override = require $local;
+    if (!is_array($override)) throw new RuntimeException('config.local.php must return an array.');
+    $config = array_replace_recursive($config, $override);
+}
+return $config;

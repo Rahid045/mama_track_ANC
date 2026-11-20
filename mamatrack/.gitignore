@@ -8,6 +8,7 @@
 .env
 .env.*
 !.env.example
+/includes/config.local.php
 
 # PHP dependencies
 /vendor/

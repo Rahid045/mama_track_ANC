@@ -1,5 +1,4 @@
-CREATE DATABASE IF NOT EXISTS mamatrack CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE mamatrack;
+-- In InfinityFree phpMyAdmin, select the database you created before importing this file.
 
 -- Drop tables only if you want a full reset
 -- DROP TABLE IF EXISTS audit_log;

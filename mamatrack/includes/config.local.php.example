@@ -1,0 +1,15 @@
+<?php
+// Copy this file to config.local.php, then fill in values from InfinityFree
+// Control Panel -> MySQL Databases. Keep the real file private.
+return [
+    'base_url' => 'https://your-site.infinityfreeapp.com',
+    'database' => [
+        'driver' => 'mysql',
+        // This is NOT localhost. Use the exact hostname supplied by InfinityFree.
+        'host' => 'sqlXXX.infinityfree.com',
+        'port' => 3306,
+        'name' => 'if0_12345678_mamatrack',
+        'user' => 'if0_12345678',
+        'password' => 'replace-with-your-hosting-account-password',
+    ],
+];

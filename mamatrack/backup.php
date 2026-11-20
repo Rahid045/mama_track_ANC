@@ -1,9 +1,9 @@
 <?php
 require __DIR__ . '/includes/bootstrap.php';
 require_role('admin');
-if (cfg('database_url')) {
+if (db()->getAttribute(PDO::ATTR_DRIVER_NAME) !== 'sqlite') {
     http_response_code(501);
-    exit('Database downloads are unavailable with hosted PostgreSQL. Use your database provider backups.');
+    exit('Database downloads are unavailable for MySQL. Export a backup using InfinityFree phpMyAdmin.');
 }
 $tmp = sys_get_temp_dir() . '/mamatrack_' . bin2hex(random_bytes(6)) . '.sqlite';
 db()->exec("VACUUM INTO '" . str_replace("'", "''", $tmp) . "'");

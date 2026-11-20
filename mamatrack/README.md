@@ -17,16 +17,15 @@ Open http://localhost:8000
 First login: `admin@mamatrack.local` / `Admin@123` (you must change it immediately).
 Demo staff (after seed): `sarah@mamatrack.local`, `peter@mamatrack.local` (doctors), `grace@mamatrack.local` (nurse) — password `Demo@1234`.
 
-## Deploy on Vercel
+## Deploy on InfinityFree
 
-This repository includes a `Dockerfile` and `Caddyfile` for Vercel's Container runtime. SQLite is retained for local XAMPP use only: Vercel instances have non-durable local storage, so production requires hosted PostgreSQL.
+1. In InfinityFree Control Panel, create a MySQL database.
+2. Open phpMyAdmin, select that database, and import `mamatrack_mysql.sql`.
+3. Copy `includes/config.local.php.example` to `includes/config.local.php`, then fill in the exact database host, database name, username, and **hosting account password** shown in InfinityFree's MySQL Databases panel. The host is not `localhost`.
+4. Upload the `mamatrack` folder contents to your domain's `htdocs` directory with File Manager or FTP. Do not upload `data/`, `Dockerfile`, or `.env.example`.
+5. Visit your site and sign in with `admin@mamatrack.local` / `Admin@123`, then change that password immediately.
 
-1. Create a PostgreSQL database (the Vercel Marketplace Postgres integration is suitable) and copy its connection URL.
-2. Import the repository into Vercel. Set the project framework to **Container** if it is not detected automatically.
-3. In **Settings → Environment Variables**, add `DATABASE_URL`, `BASE_URL` (your production URL), and a long random `CRON_SECRET`; use `.env.example` as the template. Do not commit these values.
-4. Deploy. The first request creates the tables and the initial administrator. Change the initial administrator password immediately.
-
-`vercel.json` runs the protected missed-appointment/reminder task hourly in production. The task validates Vercel's `CRON_SECRET` bearer token. Backups must be managed through the hosted PostgreSQL provider; downloading a local SQLite backup is intentionally disabled in production.
+InfinityFree free hosting does not provide cron jobs. The application performs missed-appointment and reminder checks during normal page requests, so it remains functional while the site is in use. Export MySQL backups through phpMyAdmin.
 
 ## How it maps to the proposal
 | Objective | Where |
